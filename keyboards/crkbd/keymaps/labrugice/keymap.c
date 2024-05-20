@@ -36,6 +36,15 @@ enum combos {
     KL_BSPC
 };
 
+enum custom_keycodes {
+    ARR_ONE = SAFE_RANGE,
+    ARR_TWO,
+    D_DOT,
+    ALFRED,
+    SOURCE,
+    THINGS,
+};
+
 const uint16_t PROGMEM jk_combo[] = { HOME_J, HOME_K, COMBO_END };
 const uint16_t PROGMEM df_combo[] = { HOME_D, HOME_F, COMBO_END };
 const uint16_t PROGMEM kl_combo[] = { HOME_K, HOME_L, COMBO_END };
@@ -46,14 +55,62 @@ combo_t key_combos[] = {
     [KL_BSPC] = COMBO(kl_combo, KC_BSPC),
 };
 
+bool process_record_user(uint16_t keycode, keyrecord_t* record) {
+    switch (keycode) {
+        case ARR_ONE:  // Arrow macro, types ->.
+            if (record->event.pressed) {
+                SEND_STRING("->");
+            }
+            return false;
+
+        case ARR_TWO:  // Arrow macro, types =>.
+            if (record->event.pressed) {
+                SEND_STRING("=>");
+            }
+            return false;
+
+        case D_DOT:  // Double-dot macro, types ::
+            if (record->event.pressed) {
+                SEND_STRING("::");
+            }
+            return false;
+        case ALFRED:  // ALFRED macro, types ~
+            if (record->event.pressed) {
+                register_code(KC_LALT);
+                tap_code(KC_SPC);
+                unregister_code(KC_LALT);
+            }
+            return false;
+        case SOURCE:
+            if (record->event.pressed) {
+                register_code(KC_LSFT);
+                register_code(KC_LGUI);
+                tap_code(KC_SPC);
+                unregister_code(KC_LSFT);
+                unregister_code(KC_LGUI);
+             }
+        return false;
+            case THINGS:
+                if (record->event.pressed) {
+                    register_code(KC_LSFT);
+                    register_code(KC_LGUI);
+                    tap_code(KC_N);
+                    unregister_code(KC_LSFT);
+                    unregister_code(KC_LGUI);
+                }
+            return false;
+    }
+  return true;
+}
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [0] = LAYOUT_split_3x6_3(
   //,-----------------------------------------------------.                    ,-----------------------------------------------------.
        KC_TAB,    KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,                         KC_Y,    KC_U,    KC_I,    KC_O,   KC_P,  KC_BSPC,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      KC_LCTL,  HOME_A,  HOME_S,  HOME_D,  HOME_F,    KC_G,                         KC_H,  HOME_J,  HOME_K,  HOME_L,HOME_SCLN, KC_QUOT,
+      KC_LCTL,  HOME_A,  HOME_S,  HOME_D,  HOME_F,    KC_G,                         KC_H,  HOME_J,  HOME_K,  HOME_L,HOME_SCLN, THINGS,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      KC_LSFT,    KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                         KC_N,    KC_M, KC_COMM,  KC_DOT, KC_SLSH,  KC_ESC,
+       SOURCE,    KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                         KC_N,    KC_M, KC_COMM,  KC_DOT, KC_SLSH,  ALFRED,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
                                           KC_COLN,   MO(1),  LSFT_T(KC_SPC),     RCTL_T(KC_ENT),   MO(2), KC_QUOT
                                       //`--------------------------'  `--------------------------'
@@ -74,11 +131,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [2] = LAYOUT_split_3x6_3(
   //,-----------------------------------------------------.                    ,-----------------------------------------------------.
-       KC_TAB, KC_EXLM,   KC_AT, KC_HASH, KC_LABK, KC_PERC,                      KC_CIRC, KC_RABK, KC_ASTR, KC_LPRN, KC_RPRN, KC_BSPC,
+       KC_TAB, KC_EXLM,   KC_AT,  KC_DLR,  KC_EQL, KC_UNDS,                      KC_CIRC, KC_PERC, KC_ASTR, KC_LPRN, KC_RPRN, KC_BSPC,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      KC_LCTL, XXXXXXX, KC_LBRC, KC_LCBR, KC_LPRN, KC_EQL,                       KC_DLR,  KC_RPRN, KC_RCBR, KC_RBRC, KC_BSLS,  KC_GRV,
+      KC_LCTL, XXXXXXX, KC_LBRC, KC_LCBR, KC_LPRN,  KC_EQL,                      KC_HASH, KC_RPRN, KC_RCBR, KC_RBRC, KC_BSLS,  KC_GRV,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      KC_LSFT, XXXXXXX, XXXXXXX, KC_UNDS, KC_MINS, XXXXXXX,                      KC_UNDS, KC_MINS, KC_PPLS, KC_AMPR, KC_PIPE, KC_TILD,
+      KC_LSFT, XXXXXXX,   D_DOT, ARR_TWO, ARR_ONE, KC_MINS,                      KC_UNDS, KC_MINS, KC_PPLS, KC_AMPR, KC_PIPE, KC_TILD,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
                                           KC_LGUI,   MO(3),  KC_SPC,     KC_ENT, _______, KC_RALT
                                       //`--------------------------'  `--------------------------'
@@ -86,7 +143,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [3] = LAYOUT_split_3x6_3(
   //,-----------------------------------------------------.                    ,-----------------------------------------------------.
-        QK_BOOT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+      QK_BOOT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       RGB_TOG, RGB_HUI, XXXXXXX,   KC_F1,   KC_F2, XXXXXXX,                      XXXXXXX, KC_VOLD, KC_VOLU, XXXXXXX, XXXXXXX, XXXXXXX,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
